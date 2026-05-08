@@ -1,0 +1,79 @@
+[
+  {
+    "id": "94007727-f334-4b32-b372-20f1362d3d2d",
+    "name": "DJ WolfmanBen",
+    "style": "Disco & Funk",
+    "description": "O mestre do groove! Tião coleciona vinis desde 1976 e leva o público ao delírio com hits do Soul, Funk e Disco dos anos 70.",
+    "decades": [
+      "70s",
+      "80s"
+    ],
+    "color": "linear-gradient(135deg,#ff2d78,#c400ff)",
+    "initials": "TI",
+    "schedule": "21:00 – 22:30"
+  },
+  {
+    "id": "7f4d0c47-5d53-42de-8445-c80ccfd88aad",
+    "name": "DJ Karen",
+    "style": "New Wave & Synth",
+    "description": "Rainha do sintetizador! Karen é especialista em New Wave, Synth Pop e Italo Disco — a trilha sonora da geração cassete.",
+    "decades": [
+      "80s"
+    ],
+    "color": "linear-gradient(135deg,#00f0ff,#0040ff)",
+    "initials": "KA",
+    "schedule": "22:30 – 00:00"
+  },
+  {
+    "id": "3e3f547f-2d15-4646-ab7d-007778ce52ab",
+    "name": "DJ Marquinho",
+    "style": "Eurodance & Techno",
+    "description": "Do Eurodance ao Techno, Marquinho domina os anos 90 com energia total. Especialista em Snap, Ace of Base e muito mais.",
+    "decades": [
+      "90s"
+    ],
+    "color": "linear-gradient(135deg,#ffe600,#ff6600)",
+    "initials": "MR",
+    "schedule": "00:00 – 02:00"
+  },
+  {
+    "id": "29c2f8df-a2ae-49eb-a92f-fa9740166ef2",
+    "name": "DJ Lady Rock",
+    "style": "Pop Rock & Metal",
+    "description": "Ela comanda o palco alternativo com o melhor do Rock dos anos 80 e 90: Guns N Roses, Nirvana, Bon Jovi e muito mais!",
+    "decades": [
+      "80s",
+      "90s"
+    ],
+    "color": "linear-gradient(135deg,#ff2d78,#800040)",
+    "initials": "LR",
+    "schedule": "02:00 – 03:30"
+  },
+  {
+    "id": "a0bbf28e-f22d-4600-9e66-ac47c0b648f1",
+    "name": "DJ Phunk",
+    "style": "Soul & R&B",
+    "description": "Soul profundo! Phunk traz o melhor do R&B clássico, desde Stevie Wonder e Marvin Gaye até a ebulição musical dos 90.",
+    "decades": [
+      "70s",
+      "80s",
+      "90s"
+    ],
+    "color": "linear-gradient(135deg,#c400ff,#4400aa)",
+    "initials": "PH",
+    "schedule": "19:00 – 21:00"
+  },
+  {
+    "id": "15039864-cbdd-4c3f-8e7f-f3364024a864",
+    "name": "DJ Bossa",
+    "style": "MPB & Axé",
+    "description": "O representante nacional! MPB, pagode dos 90 e axé music fazem a festa de quem ama o melhor da música brasileira.",
+    "decades": [
+      "80s",
+      "90s"
+    ],
+    "color": "linear-gradient(135deg,#00ff88,#008844)",
+    "initials": "BS",
+    "schedule": "18:00 – 19:00"
+  }
+]

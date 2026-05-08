@@ -1,0 +1,57 @@
+[
+  {
+    "id": "4098d83d-9816-44c4-a1a7-8848b91a0523",
+    "title": "Line-up completo revelado com 8 DJs",
+    "category": "Line-up",
+    "content": "A festa FLASHBACK confirma sua maior edição com DJs especializados em décadas 70, 80 e 90. Confira a programação completa.",
+    "icon": "🎶",
+    "status": "published",
+    "date": "28/05/2025",
+    "image": "/uploads/e97c282a044d456cb0597fe46c71930e.jpeg"
+  },
+  {
+    "id": "cfce4667-820a-4e61-bb77-a198a6c7f4de",
+    "title": "Pista VIP com bola de discoteca original",
+    "category": "Estrutura",
+    "content": "A área VIP contará com bola de discoteca importada dos anos 70, criando aquele efeito nostálgico inesquecível.",
+    "icon": "🪩",
+    "status": "published",
+    "date": "22/05/2025"
+  },
+  {
+    "id": "1a522d13-a6bd-4489-87af-3a2d3e59ac35",
+    "title": "Lote promocional esgota em 48 horas",
+    "category": "Ingressos",
+    "content": "O primeiro lote de ingressos foi encerrado em tempo recorde. O segundo lote está disponível a partir de R$ 60.",
+    "icon": "🎟️",
+    "status": "published",
+    "date": "18/05/2025"
+  },
+  {
+    "id": "8b6a2788-5ca1-4cf9-9163-9397b403293e",
+    "title": "Regulamento do dress code retrô",
+    "category": "Dress Code",
+    "content": "Venha com o visual dos anos 80! Legging, ombreiras e mullet são bem-vindos. Quem comparecer fantasiado ganha cortesia no bar.",
+    "icon": "👗",
+    "status": "published",
+    "date": "15/05/2025"
+  },
+  {
+    "id": "7520c060-338f-45a9-b9cf-a220c8c464c9",
+    "title": "Local: Centro de Eventos Pavilhão Sul",
+    "category": "Local",
+    "content": "A festa acontece no espaçoso Pavilhão Sul com capacidade para 2.000 pessoas, estacionamento próprio e acessibilidade total.",
+    "icon": "📍",
+    "status": "published",
+    "date": "10/05/2025"
+  },
+  {
+    "id": "3abcf867-0d30-473d-b0c7-75b38da1f788",
+    "title": "Open bar de bebidas retrô incluído no VIP",
+    "category": "Gastronomia",
+    "content": "Drinks temáticos inspirados nas décadas: Rum Coke dos 70, Harvey Wallbanger dos 80 e Cosmopolitan dos 90.",
+    "icon": "🍹",
+    "status": "published",
+    "date": "05/05/2025"
+  }
+]
