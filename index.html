@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FLASHBACK – Festa Anos 70, 80 e 90</title>
+<link rel="manifest" href="manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FLASHBACK">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="theme-color" content="#ff2d78">
+<style>
+/* System font fallbacks while Google Fonts loads */
+@font-face{font-family:'Bebas Neue';font-style:normal;font-weight:400;src:local('Impact'),local('Arial Black');font-display:swap;}
+@font-face{font-family:'Righteous';font-style:normal;font-weight:400;src:local('Georgia'),local('Arial');font-display:swap;}
+@font-face{font-family:'Barlow';font-style:normal;font-weight:400;src:local('Arial'),local('Helvetica');font-display:swap;}
+</style>
+<script>
+// Load Google Fonts only when online (avoids Electron file:// hang)
+if(navigator.onLine){
+  const l=document.createElement('link');
+  l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Righteous&family=Barlow:wght@300;400;600;700&display=swap';
+  document.head.appendChild(l);
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --pink:#ff2d78;--cyan:#00f0ff;--yellow:#ffe600;--purple:#c400ff;
+  --dark:#080810;--dark2:#10101e;--dark3:#181828;--dark4:#1f1f35;
+  --text:#f0eaf8;--muted:#9988bb;--border:rgba(255,255,255,0.08);
+}
+body{font-family:'Barlow',sans-serif;background:var(--dark);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px);pointer-events:none;z-index:9999;}
+ 
+/* ── TOAST ── */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:10000;display:flex;flex-direction:column;gap:.5rem;}
+.toast-msg{padding:12px 20px;border-radius:6px;font-size:.85rem;font-weight:600;letter-spacing:1px;animation:slideIn .25s ease;box-shadow:0 4px 20px rgba(0,0,0,.5);}
+.toast-msg.ok{background:#0d2d1e;border:1px solid rgba(0,240,255,.4);color:var(--cyan);}
+.toast-msg.err{background:#2d0d18;border:1px solid rgba(255,45,120,.4);color:var(--pink);}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0}to{transform:translateX(0);opacity:1}}
+ 
+/* ── MODAL ── */
+#modalBg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:5000;align-items:center;justify-content:center;padding:1rem;}
+#modalBg.open{display:flex;}
+.modal{background:var(--dark3);border:1px solid rgba(196,0,255,.35);border-radius:10px;padding:2rem;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;position:relative;}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--purple);margin-bottom:1.4rem;}
+.modal-close{position:absolute;top:1rem;right:1.2rem;background:none;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;}
+.modal-close:hover{color:var(--pink);}
+ 
+/* ── FORMS ── */
+.form-group{margin-bottom:1rem;}
+.form-group label{display:block;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;font-weight:700;}
+.form-group input,.form-group textarea,.form-group select{width:100%;background:var(--dark2);border:1.5px solid rgba(196,0,255,.22);border-radius:4px;padding:9px 12px;color:var(--text);font-family:'Barlow',sans-serif;font-size:.92rem;outline:none;transition:border-color .2s;}
+.form-group textarea{resize:vertical;min-height:85px;line-height:1.6;}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--purple);box-shadow:0 0 10px rgba(196,0,255,.15);}
+.form-group select option{background:var(--dark2);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem;}
+.btn{padding:9px 22px;border:none;border-radius:4px;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.btn-primary{background:var(--purple);color:#fff;box-shadow:0 0 16px rgba(196,0,255,.3);}
+.btn-primary:hover{background:var(--pink);box-shadow:0 0 20px rgba(255,45,120,.35);}
+.btn-danger{background:transparent;border:1.5px solid rgba(255,45,120,.4);color:var(--pink);}
+.btn-danger:hover{background:rgba(255,45,120,.1);}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted);}
+.btn-ghost:hover{border-color:var(--muted);color:var(--text);}
+.form-actions{display:flex;gap:.6rem;justify-content:flex-end;margin-top:1.2rem;}
+ 
+/* upload zone */
+.upload-zone{border:2px dashed rgba(196,0,255,.3);border-radius:6px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--dark2);position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--purple);background:rgba(196,0,255,.06);}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-zone p{font-size:.82rem;color:var(--muted);pointer-events:none;}
+.upload-zone .up-icon{font-size:1.8rem;margin-bottom:.3rem;display:block;pointer-events:none;}
+.img-preview{display:none;margin-top:.8rem;position:relative;}
+.img-preview img{width:100%;max-height:160px;object-fit:cover;border-radius:5px;border:1px solid rgba(196,0,255,.25);}
+.img-preview .rm-img{position:absolute;top:.4rem;right:.4rem;background:rgba(255,45,120,.85);border:none;border-radius:50%;width:26px;height:26px;color:#fff;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;}
+.upload-progress{height:3px;background:rgba(196,0,255,.15);border-radius:2px;margin-top:.6rem;display:none;}
+.upload-progress-bar{height:100%;background:var(--purple);border-radius:2px;width:0;transition:width .3s;}
+ 
+/* ── HEADER ── */
+header{background:var(--dark2);border-bottom:2px solid var(--pink);position:sticky;top:0;z-index:100;box-shadow:0 0 30px rgba(255,45,120,.22);}
+.hdr{max-width:1200px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:66px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:2.1rem;letter-spacing:4px;color:var(--yellow);text-shadow:0 0 10px rgba(255,230,0,.5),0 0 28px rgba(255,230,0,.2);cursor:pointer;user-select:none;animation:flicker 7s infinite;}
+.logo span{color:var(--pink);text-shadow:0 0 10px rgba(255,45,120,.8);}
+@keyframes flicker{0%,94%,100%{opacity:1}95%{opacity:.55}97%{opacity:.9}98%{opacity:.45}}
+nav{display:flex;gap:.35rem;align-items:center;}
+.nav-btn{font-family:'Barlow',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;padding:7px 16px;border:1.5px solid transparent;border-radius:4px;cursor:pointer;background:transparent;color:var(--text);transition:all .2s;white-space:nowrap;}
+.nav-btn:hover,.nav-btn.active{border-color:var(--cyan);color:var(--cyan);background:rgba(0,240,255,.05);}
+.nav-btn.dj{border-color:var(--pink);color:var(--pink);background:rgba(255,45,120,.07);}
+.nav-btn.dj:hover,.nav-btn.dj.active{background:rgba(255,45,120,.18);color:#fff;}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:5px;background:none;border:none;}
+.hamburger span{display:block;width:22px;height:2px;background:var(--cyan);border-radius:2px;}
+.mob-nav{display:none;flex-direction:column;background:var(--dark2);border-top:1px solid rgba(0,240,255,.12);padding:1rem 1.5rem;gap:.4rem;}
+.mob-nav.open{display:flex;}
+.mob-nav .nav-btn{text-align:left;width:100%;}
+ 
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;}
+ 
+/* ── HERO ── */
+.hero{position:relative;overflow:hidden;padding:5.5rem 1.5rem 4.5rem;text-align:center;background:radial-gradient(ellipse at 50% 65%,rgba(196,0,255,.14) 0%,transparent 65%),radial-gradient(ellipse at 15% 20%,rgba(255,45,120,.09) 0%,transparent 50%);}
+.disco-ball{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:200px;height:200px;border-radius:50%;background:conic-gradient(#ff2d78,#ffe600,#00f0ff,#c400ff,#ff2d78,#ffe600,#00f0ff,#ff2d78);opacity:.09;animation:spin 10s linear infinite;}
+@keyframes spin{to{transform:translateX(-50%) rotate(360deg)}}
+.hero-sub{font-family:'Righteous',sans-serif;font-size:.86rem;letter-spacing:6px;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.4);margin-bottom:.9rem;}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3.5rem,11vw,8.5rem);line-height:.9;letter-spacing:8px;color:var(--yellow);text-shadow:0 0 22px rgba(255,230,0,.45),4px 4px 0 var(--pink);margin-bottom:.4rem;}
+.hero-years{font-family:'Righteous',sans-serif;font-size:clamp(.9rem,2.5vw,1.5rem);color:var(--muted);letter-spacing:4px;margin-bottom:.6rem;}
+.hero-years span{color:var(--pink);}
+.hero-date{font-family:'Barlow',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:3px;text-transform:uppercase;color:var(--text);margin-bottom:2rem;opacity:.7;}
+.hero-date span{color:var(--yellow);}
+.hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+.hero-cta{display:inline-flex;align-items:center;gap:.5rem;padding:13px 36px;background:var(--pink);color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:2.5px;text-transform:uppercase;border:none;border-radius:3px;cursor:pointer;text-decoration:none;box-shadow:0 0 22px rgba(255,45,120,.45);transition:all .2s;}
+.hero-cta:hover{transform:translateY(-2px);}
+.hero-cta.wpp{background:#25D366;box-shadow:0 0 22px rgba(37,211,102,.45);}
+.hero-cta.wpp:hover{background:#1ebe5d;box-shadow:0 0 30px rgba(37,211,102,.55);}
+.hero-cta.outline{background:transparent;border:2px solid var(--cyan);color:var(--cyan);box-shadow:none;}
+.hero-cta.outline:hover{background:rgba(0,240,255,.08);box-shadow:0 0 18px rgba(0,240,255,.25);}
+ 
+/* ── TICKER ── */
+.ticker-wrap{background:var(--pink);overflow:hidden;padding:9px 0;position:relative;}
+.ticker-track{display:flex;animation:marquee 30s linear infinite;white-space:nowrap;}
+.ticker-track span{font-weight:700;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;padding:0 2.5rem;color:#fff;}
+.ticker-track span::before{content:'★  ';}
+.ticker-edit-btn{position:absolute;right:.8rem;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.4);border-radius:4px;color:#fff;font-size:.68rem;letter-spacing:1.5px;padding:3px 10px;cursor:pointer;z-index:10;white-space:nowrap;font-weight:700;}
+.ticker-edit-btn:hover{background:rgba(0,0,0,.6);}
+/* editable hero fields */
+[contenteditable="true"]{outline:2px dashed rgba(255,230,0,.6);border-radius:4px;cursor:text;}
+[contenteditable="true"]:focus{outline:2px solid var(--yellow);background:rgba(255,230,0,.06);}
+.hero-edit-bar{display:none;align-items:center;gap:.6rem;justify-content:center;padding:.5rem 1rem;background:rgba(255,230,0,.08);border-bottom:1px solid rgba(255,230,0,.2);font-size:.72rem;letter-spacing:1.5px;color:var(--yellow);font-weight:700;}
+.hero-edit-bar.show{display:flex;}
+.hero-edit-bar button{padding:4px 14px;border-radius:4px;border:1.5px solid var(--yellow);background:transparent;color:var(--yellow);font-size:.7rem;font-weight:700;letter-spacing:1px;cursor:pointer;}
+.hero-edit-bar button.save{background:var(--yellow);color:#111;}
+.hero-edit-bar button:hover{opacity:.8;}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+ 
+/* ── SECTION ── */
+.section{max-width:1200px;margin:0 auto;padding:4rem 1.5rem;}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:4px;color:var(--cyan);text-shadow:0 0 10px rgba(0,240,255,.3);margin-bottom:.3rem;}
+.sec-line{width:55px;height:3px;background:linear-gradient(90deg,var(--pink),transparent);margin-bottom:2rem;}
+.sec-sub{color:var(--muted);font-size:.9rem;margin-bottom:2rem;line-height:1.7;max-width:600px;}
+ 
+/* ── COUNTDOWN ── */
+.countdown-band{background:var(--dark3);border-top:1px solid rgba(0,240,255,.1);border-bottom:1px solid rgba(0,240,255,.1);padding:2.5rem 1.5rem;text-align:center;}
+.countdown-label{font-family:'Righteous',sans-serif;font-size:.8rem;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;}
+.countdown-grid{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;}
+.cd-unit{background:var(--dark4);border:1px solid rgba(0,240,255,.15);border-radius:8px;padding:1rem 1.4rem;min-width:80px;text-align:center;}
+.cd-num{font-family:'Bebas Neue',sans-serif;font-size:2.8rem;color:var(--cyan);line-height:1;display:block;}
+.cd-lbl{font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:.2rem;display:block;}
+ 
+/* ── NEWS CARDS ── */
+.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.6rem;}
+.news-grid.has-posters{grid-template-columns:repeat(auto-fill,minmax(340px,1fr));}
+.news-card{background:var(--dark3);border:1px solid rgba(255,45,120,.16);border-radius:8px;overflow:hidden;transition:all .25s;display:flex;flex-direction:column;}
+.news-card:hover{border-color:var(--pink);transform:translateY(-5px);box-shadow:0 12px 36px rgba(255,45,120,.25);}
+.news-card.has-img .news-img{width:100%;height:320px;object-fit:contain;display:block;background:var(--dark4);}
+.news-card.no-img .news-icon-box{width:100%;height:110px;display:flex;align-items:center;justify-content:center;font-size:3.2rem;background:var(--dark4);}
+.news-body{padding:1.2rem;flex:1;display:flex;flex-direction:column;}
+.news-tag{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--yellow);margin-bottom:.5rem;font-weight:700;}
+.news-card h3{font-family:'Righteous',sans-serif;font-size:1.05rem;color:var(--text);line-height:1.4;margin-bottom:.55rem;}
+.news-card p{font-size:.85rem;color:var(--muted);line-height:1.65;flex:1;}
+.news-date{font-size:.7rem;color:var(--pink);margin-top:.9rem;letter-spacing:1px;}
+.empty-state{text-align:center;padding:3.5rem;color:var(--muted);font-size:.9rem;letter-spacing:1px;grid-column:1/-1;}
+.empty-state .big{font-size:2.8rem;margin-bottom:.8rem;display:block;}
+ 
+/* ── PROGRAMAÇÃO ── */
+.prog-bg{background:var(--dark3);border-top:1px solid rgba(255,45,120,.12);border-bottom:1px solid rgba(255,45,120,.12);padding:4rem 0;}
+.prog-inner{max-width:900px;margin:0 auto;padding:0 1.5rem;}
+.prog-list{display:flex;flex-direction:column;gap:0;}
+.prog-item{display:grid;grid-template-columns:110px 1fr auto;gap:1rem;align-items:center;padding:1rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.prog-edit-btn{background:transparent;border:1.5px solid rgba(0,240,255,.3);border-radius:4px;color:var(--cyan);font-size:.72rem;letter-spacing:1px;padding:5px 10px;cursor:pointer;white-space:nowrap;font-family:'Barlow',sans-serif;font-weight:700;transition:all .2s;}
+.prog-edit-btn:hover{background:rgba(0,240,255,.1);border-color:var(--cyan);}
+.prog-item:last-child{border-bottom:none;}
+.prog-time{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;color:var(--yellow);letter-spacing:2px;}
+.prog-dj{font-family:'Righteous',sans-serif;font-size:1rem;color:var(--text);margin-bottom:.15rem;}
+.prog-style{font-size:.75rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--pink);font-weight:600;}
+ 
+/* ── INFO CARDS ── */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;}
+.info-card{background:var(--dark3);border:1px solid rgba(0,240,255,.12);border-radius:7px;padding:1.6rem 1.4rem;border-top:3px solid var(--cyan);transition:all .25s;}
+.info-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,240,255,.12);}
+.info-icon{font-size:2rem;margin-bottom:.8rem;display:block;}
+.info-card h4{font-family:'Righteous',sans-serif;font-size:1rem;color:var(--text);margin-bottom:.5rem;}
+.info-card p{font-size:.84rem;color:var(--muted);line-height:1.65;}
+.info-card a{color:var(--cyan);text-decoration:none;}
+.info-card a:hover{text-decoration:underline;}
+ 
+/* ── DJ CARDS ── */
+.dj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:1.7rem;}
+.dj-card{background:var(--dark3);border:1px solid rgba(0,240,255,.16);border-radius:8px;padding:1.7rem 1.3rem;text-align:center;transition:all .3s;position:relative;overflow:hidden;}
+.dj-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--purple));}
+.dj-card:hover{border-color:var(--cyan);transform:translateY(-5px);box-shadow:0 12px 36px rgba(0,240,255,.16);}
+.dj-avatar{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:#fff;margin:0 auto 1rem;border:3px solid rgba(0,240,255,.22);overflow:hidden;position:relative;}
+.dj-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.dj-name{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:3px;color:var(--cyan);margin-bottom:.22rem;}
+.dj-style{font-size:.73rem;letter-spacing:2px;text-transform:uppercase;color:var(--pink);margin-bottom:.8rem;font-weight:700;}
+.dj-desc{font-size:.83rem;color:var(--muted);line-height:1.7;margin-bottom:.9rem;}
+.dj-schedule{font-size:.73rem;letter-spacing:1px;color:var(--yellow);margin-bottom:.8rem;font-weight:600;}
+.dj-decades{display:flex;justify-content:center;gap:.4rem;flex-wrap:wrap;}
+.dj-decade{font-size:.68rem;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:20px;border:1px solid rgba(255,230,0,.32);color:var(--yellow);background:rgba(255,230,0,.06);}
+ 
+/* ── GALERIA PLACEHOLDER ── */
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;}
+.gallery-slot{aspect-ratio:4/3;background:var(--dark3);border:1px dashed rgba(0,240,255,.18);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:.75rem;letter-spacing:1px;}
+ 
+/* ── FAQ ── */
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.8rem;}
+.faq-item{background:var(--dark3);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
+.faq-q{width:100%;text-align:left;padding:1.1rem 1.3rem;background:none;border:none;color:var(--text);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;letter-spacing:.5px;}
+.faq-q:hover{color:var(--cyan);}
+.faq-q .arrow{color:var(--pink);font-size:1.1rem;transition:transform .25s;}
+.faq-item.open .faq-q .arrow{transform:rotate(90deg);}
+.faq-a{display:none;padding:0 1.3rem 1.1rem;font-size:.86rem;color:var(--muted);line-height:1.75;}
+.faq-item.open .faq-a{display:block;}
+ 
+/* ── CTA BAND ── */
+.cta-band{background:linear-gradient(135deg,rgba(255,45,120,.18) 0%,rgba(196,0,255,.12) 100%);border-top:1px solid rgba(255,45,120,.2);border-bottom:1px solid rgba(196,0,255,.2);padding:3.5rem 1.5rem;text-align:center;}
+.cta-band h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,5vw,3rem);letter-spacing:4px;color:var(--yellow);text-shadow:0 0 16px rgba(255,230,0,.3);margin-bottom:.6rem;}
+.cta-band p{color:var(--muted);font-size:.9rem;margin-bottom:1.8rem;letter-spacing:1px;}
+.cta-band .hero-btns{margin-top:0;}
+ 
+/* ── ADMIN ── */
+.admin-wrapper{min-height:calc(100vh - 66px);display:flex;align-items:center;justify-content:center;padding:3rem 1.5rem;background:radial-gradient(ellipse at center,rgba(196,0,255,.07) 0%,transparent 70%);}
+.login-box{background:var(--dark3);border:1px solid rgba(196,0,255,.3);border-radius:10px;padding:2.4rem 2rem;width:100%;max-width:390px;box-shadow:0 0 50px rgba(196,0,255,.1);}
+.login-box h2{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:4px;color:var(--purple);text-shadow:0 0 12px rgba(196,0,255,.4);margin-bottom:.2rem;}
+.login-box p{font-size:.8rem;color:var(--muted);margin-bottom:1.7rem;letter-spacing:1px;}
+.login-btn{width:100%;padding:11px;background:var(--purple);border:none;border-radius:4px;color:#fff;font-family:'Barlow',sans-serif;font-weight:700;font-size:.8rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;box-shadow:0 0 16px rgba(196,0,255,.3);transition:all .2s;margin-top:.4rem;}
+.login-btn:hover{background:var(--pink);transform:translateY(-1px);}
+.login-err{display:none;margin-top:.8rem;padding:9px 13px;background:rgba(255,45,120,.1);border:1px solid rgba(255,45,120,.35);border-radius:4px;font-size:.8rem;color:var(--pink);text-align:center;}
+.login-err.show{display:block;}
+.admin-panel{display:none;max-width:1150px;margin:0 auto;padding:2.5rem 1.5rem;}
+.admin-panel.show{display:block;}
+.admin-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid rgba(196,0,255,.18);}
+.admin-topbar h2{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--purple);}
+.logout-btn{padding:7px 16px;background:transparent;border:1.5px solid rgba(255,45,120,.4);border-radius:4px;color:var(--pink);font-size:.76rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Barlow',sans-serif;font-weight:700;transition:all .2s;}
+.logout-btn:hover{background:rgba(255,45,120,.1);}
+.admin-tabs{display:flex;gap:.3rem;margin-bottom:1.8rem;border-bottom:1px solid var(--border);}
+.tab-btn{font-family:'Barlow',sans-serif;font-weight:700;font-size:.76rem;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.tab-btn:hover:not(.active){color:var(--text);}
+.tab-pane{display:none;}
+.tab-pane.active{display:block;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.85rem;margin-bottom:2rem;}
+.stat-card{background:var(--dark3);border:1px solid rgba(0,240,255,.1);border-radius:6px;padding:1.1rem 1.3rem;border-top:3px solid var(--cyan);}
+.stat-label{font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.3rem;font-weight:700;}
+.stat-number{font-family:'Bebas Neue',sans-serif;font-size:1.85rem;color:var(--cyan);}
+.tbl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;}
+.tbl-header h3{font-family:'Righteous',sans-serif;font-size:.95rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.admin-table{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:2.2rem;}
+.admin-table th{text-align:left;padding:8px 12px;background:var(--dark3);font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(0,240,255,.1);font-weight:700;}
+.admin-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);vertical-align:middle;}
+.admin-table tr:hover td{background:rgba(255,255,255,.02);}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.65rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+.badge.pub{background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid rgba(0,240,255,.25);}
+.badge.draft{background:rgba(255,230,0,.08);color:var(--yellow);border:1px solid rgba(255,230,0,.25);}
+.icon-btn{width:28px;height:28px;border-radius:4px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-size:.95rem;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;margin-left:3px;}
+.icon-btn:hover.edit{border-color:var(--cyan);color:var(--cyan);}
+.icon-btn:hover.del{border-color:var(--pink);color:var(--pink);}
+.thumb-admin{width:38px;height:30px;object-fit:cover;border-radius:3px;border:1px solid rgba(255,255,255,.1);}
+ 
+/* ── FOOTER ── */
+footer{background:var(--dark2);border-top:1px solid rgba(255,45,120,.15);padding:2.5rem 1.5rem;}
+.footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:2rem;align-items:start;}
+.ft-logo{font-family:'Bebas Neue',sans-serif;font-size:1.9rem;letter-spacing:5px;color:var(--yellow);text-shadow:0 0 10px rgba(255,230,0,.3);margin-bottom:.6rem;}
+.footer-inner p,.footer-inner a{font-size:.8rem;color:var(--muted);line-height:2;letter-spacing:.5px;text-decoration:none;display:block;}
+.footer-inner a:hover{color:var(--cyan);}
+.footer-col h5{font-family:'Righteous',sans-serif;font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem;}
+.footer-bottom{max-width:1200px;margin:.8rem auto 0;padding-top:1rem;border-top:1px solid rgba(255,255,255,.05);text-align:center;font-size:.73rem;color:rgba(153,136,187,.5);letter-spacing:1px;}
+ 
+/* ── RESPONSIVE ── */
+
+/* ── CONFIG SECTIONS ── */
+.cfg-section{background:var(--dark3);border:1px solid rgba(0,240,255,.1);border-radius:8px;padding:1.4rem 1.6rem;margin-bottom:1.4rem;}
+.cfg-section-title{font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:3px;color:var(--cyan);margin-bottom:1rem;text-transform:uppercase;}
+.cfg-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.cfg-hint{display:block;font-size:.7rem;color:var(--muted);margin-top:.35rem;letter-spacing:.4px;line-height:1.5;}
+input[type="datetime-local"]{color-scheme:dark;}
+
+@media(max-width:768px){
+  nav{display:none;} .hamburger{display:flex;}
+  .cfg-grid-2{grid-template-columns:1fr;}
+  .hero{padding:3rem 1rem 2.5rem;}
+  .hero-title{letter-spacing:3px;}
+  .hero-btns{flex-direction:column;align-items:center;}
+  .section{padding:2.5rem 1rem;}
+  .form-row{grid-template-columns:1fr;}
+  .footer-inner{grid-template-columns:1fr;}
+  .prog-item{grid-template-columns:90px 1fr;} .prog-edit-btn{display:none;}
+  .admin-panel{padding:1.8rem 1rem;}
+  .admin-table th:nth-child(3),.admin-table td:nth-child(3){display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .news-grid{grid-template-columns:1fr;}
+  .news-card.has-img .news-img{height:260px;object-fit:contain;}
+  .hero-edit-bar{flex-wrap:wrap;gap:.5rem;text-align:center;font-size:.68rem;}
+  .ticker-edit-btn{font-size:.6rem;padding:2px 7px;}
+}
+@media(max-width:480px){
+  .news-grid{grid-template-columns:1fr;}
+  .news-card.has-img .news-img{height:220px;object-fit:contain;}
+  .admin-tabs{flex-wrap:wrap;}
+  .tab-btn{font-size:.72rem;padding:7px 10px;}
+}
+</style>
+</head>
+<body>
+ 
+<div id="toast"></div>
+<div id="modalBg">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+ 
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="hdr">
+    <div class="logo" onclick="navigate('home')">FLASH<span>BACK</span></div>
+    <nav>
+      <button class="nav-btn active" id="nav-home"  onclick="navigate('home')">Início</button>
+      <button class="nav-btn"        id="nav-news"  onclick="navigate('news')">Notícias</button>
+      <button class="nav-btn dj"     id="nav-djs"   onclick="navigate('djs')">🎧 DeeJays</button>
+      <button class="nav-btn"        id="nav-prog"  onclick="navigate('prog')">Programação</button>
+      <button class="nav-btn"        id="nav-admin" onclick="navigate('admin')">Admin</button>
+    </nav>
+    <button class="hamburger" onclick="toggleMob()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mob-nav" id="mobNav">
+    <button class="nav-btn" onclick="navigate('home');closeMob()">Início</button>
+    <button class="nav-btn" onclick="navigate('news');closeMob()">Notícias</button>
+    <button class="nav-btn dj" onclick="navigate('djs');closeMob()">🎧 DeeJays</button>
+    <button class="nav-btn" onclick="navigate('prog');closeMob()">Programação</button>
+    <button class="nav-btn" onclick="navigate('admin');closeMob()">Admin</button>
+  </div>
+</header>
+
+<!-- barra de edição da home — só aparece quando admin está logado -->
+<div class="hero-edit-bar" id="heroEditBar">
+  ✏️ Modo edição — clique diretamente nos textos da home para editar
+  <button onclick="saveHeroTexts()" class="save">💾 Salvar</button>
+  <button onclick="cancelHeroEdit()">Cancelar</button>
+</div>
+ 
+<!-- ═══ HOME ═══ -->
+<div class="page active" id="page-home">
+  <section class="hero">
+    <div class="disco-ball"></div>
+    <p class="hero-sub" id="heroSub" contenteditable="false">A maior festa retrô do ano</p>
+    <h1 class="hero-title" id="heroTitle" contenteditable="false">FLASHBACK</h1>
+    <p class="hero-years"><span>70s</span> · <span>80s</span> · <span>90s</span></p>
+    <p class="hero-date">📅 <span id="heroDateText">14 de Junho de 2025</span> &nbsp;·&nbsp; <span id="heroLocalText">Pavilhão Sul</span></p>
+    <div class="hero-btns">
+      <a class="hero-cta wpp" href="https://wa.me/55984281644" target="_blank" class="wpp-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Garantir Ingresso via WhatsApp
+      </a>
+    </div>
+  </section>
+ 
+  <div class="ticker-wrap" id="tickerWrap">
+    <div class="ticker-track" id="ticker">
+      <span>Nova data confirmada: 14 de Junho</span>
+      <span>Line-up completo anunciado</span>
+      <span>Ingressos VIP disponíveis via WhatsApp</span>
+      <span>Dress code: figurino dos anos 80</span>
+      <span>Sorteio de brindes na entrada</span>
+      <span>Nova data confirmada: 14 de Junho</span>
+      <span>Line-up completo anunciado</span>
+      <span>Ingressos VIP disponíveis via WhatsApp</span>
+      <span>Dress code: figurino dos anos 80</span>
+      <span>Sorteio de brindes na entrada</span>
+    </div>
+    <button class="ticker-edit-btn" id="tickerEditBtn" onclick="openTickerModal()" style="display:none">✏️ Editar fita</button>
+  </div>
+ 
+  <!-- COUNTDOWN -->
+  <div class="countdown-band" id="countdownBand">
+    <p class="countdown-label" id="countdownLabel">A FESTA COMEÇARÁ EM</p>
+    <div class="countdown-grid" id="countdownGrid">
+      <div class="cd-unit"><span class="cd-num" id="cd-d">00</span><span class="cd-lbl">Dias</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-h">00</span><span class="cd-lbl">Horas</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-m">00</span><span class="cd-lbl">Min</span></div>
+      <div class="cd-unit"><span class="cd-num" id="cd-s">00</span><span class="cd-lbl">Seg</span></div>
+    </div>
+  </div>
+ 
+  <!-- ÚLTIMAS NOTÍCIAS -->
+  <section class="section">
+    <h2 class="sec-title">Últimas Notícias</h2>
+    <div class="sec-line"></div>
+    <div class="news-grid" id="homeNewsGrid">
+      <div class="empty-state"><span class="big">🎶</span>Carregando...</div>
+    </div>
+    <div style="text-align:center;margin-top:2rem">
+      <button class="btn btn-ghost" onclick="navigate('news')" style="padding:11px 32px;font-size:.82rem;">Ver todas as notícias →</button>
+    </div>
+  </section>
+ 
+  <!-- INFO CARDS -->
+  <section class="section" style="padding-top:0">
+    <h2 class="sec-title">A Festa</h2>
+    <div class="sec-line"></div>
+    <div class="info-grid">
+      <div class="info-card">
+        <span class="info-icon">📅</span>
+        <h4>Data &amp; Horário</h4>
+        <p class="info-card-dynamic">14 de Junho de 2025<br>A partir das 18h até às 4h</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">📍</span>
+        <h4>Local</h4>
+        <p class="info-card-dynamic">Pavilhão Sul — Centro de Eventos<br>Rua das Festas, 500 — Porto Alegre/RS</p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">🎟️</span>
+        <h4>Ingressos</h4>
+        <p class="info-card-dynamic">Pista: a partir de R$ 60<br>VIP: a partir de R$ 120<br><a href="https://wa.me/55984281644" target="_blank" class="wpp-link">Comprar via WhatsApp →</a></p>
+      </div>
+      <div class="info-card">
+        <span class="info-icon">👗</span>
+        <h4>Dress Code</h4>
+        <p class="info-card-dynamic">Visual retrô dos anos 70, 80 ou 90.<br>Fantasiados ganham cortesia no bar!</p>
+      </div>
+    </div>
+  </section>
+ 
+  <!-- CTA BAND -->
+  <div class="cta-band">
+    <h2 id="ctaTitle">Garanta sua vaga agora!</h2>
+    <p id="ctaSubtitle">Ingressos limitados — não perca a maior festa retrô do ano</p>
+    <div class="hero-btns">
+      <a class="hero-cta wpp" href="https://wa.me/55984281644" target="_blank" class="wpp-link">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Falar no WhatsApp
+      </a>
+    </div>
+  </div>
+ 
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="ft-logo">FLASHBACK</div>
+        <p id="footerTagline">A maior festa retrô do Sul do Brasil</p>
+        <p style="margin-top:.4rem">📅 14 de Junho de 2025</p>
+      </div>
+      <div class="footer-col">
+        <h5>Navegação</h5>
+        <a href="#" onclick="navigate('news')">Notícias</a>
+        <a href="#" onclick="navigate('djs')">DeeJays</a>
+        <a href="#" onclick="navigate('prog')">Programação</a>
+        <a href="#" onclick="navigate('info')">Informações</a>
+      </div>
+      <div class="footer-col">
+        <h5>Contato</h5>
+        <a href="https://wa.me/55984281644" target="_blank">📲 WhatsApp</a>
+        <p id="footerEmail">flashback@festa.com.br</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 FLASHBACK — Todos os direitos reservados</div>
+  </footer>
+</div>
+ 
+<!-- ═══ NOTÍCIAS ═══ -->
+<div class="page" id="page-news">
+  <section class="section">
+    <h2 class="sec-title">Notícias</h2>
+    <div class="sec-line"></div>
+    <div class="news-grid" id="fullNewsGrid">
+      <div class="empty-state"><span class="big">📭</span>Carregando...</div>
+    </div>
+  </section>
+  <footer>
+    <div class="footer-inner"><div><div class="ft-logo">FLASHBACK</div><p>14 de Junho de 2025 · Pavilhão Sul</p></div><div></div><div></div></div>
+  </footer>
+</div>
+ 
+<!-- ═══ DJS ═══ -->
+<div class="page" id="page-djs">
+  <section class="section">
+    <h2 class="sec-title">DeeJays</h2>
+    <div class="sec-line"></div>
+    <p class="sec-sub" id="djsSubtitle">Conheça os artistas que vão fazer a festa! Cada DJ é especialista em uma ou mais décadas e vai garantir que você dance do início ao fim.</p>
+    <div class="dj-grid" id="djGrid">
+      <div class="empty-state"><span class="big">🎧</span>Carregando DeeJays...</div>
+    </div>
+  </section>
+  <footer>
+    <div class="footer-inner"><div><div class="ft-logo">FLASHBACK</div><p>14 de Junho de 2025 · Pavilhão Sul</p></div><div></div><div></div></div>
+  </footer>
+</div>
+ 
+<!-- ═══ PROGRAMAÇÃO ═══ -->
+<div class="page" id="page-prog">
+  <div class="prog-bg">
+    <div class="prog-inner">
+      <h2 class="sec-title">Programação</h2>
+      <div class="sec-line"></div>
+      <p class="sec-sub" id="progSubtitle">Ordem dos sets e horários no palco. Prepare-se para uma noite incrível do início ao fim!</p>
+      <div class="prog-list" id="progList">
+        <div class="empty-state"><span class="big">🕐</span>Carregando programação...</div>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-inner"><div><div class="ft-logo">FLASHBACK</div><p>14 de Junho de 2025 · Pavilhão Sul</p></div><div></div><div></div></div>
+  </footer>
+</div>
+ 
+<!-- ═══ INFORMAÇÕES ═══ -->
+<div class="page" id="page-info">
+  <section class="section">
+    <h2 class="sec-title">Informações</h2>
+    <div class="sec-line"></div>
+    <div class="info-grid" style="margin-bottom:3rem">
+      <div class="info-card"><span class="info-icon">📅</span><h4>Data & Horário</h4><p>14 de Junho de 2025<br>18h até às 4h</p></div>
+      <div class="info-card"><span class="info-icon">📍</span><h4>Local</h4><p>Pavilhão Sul — Centro de Eventos<br>Rua das Festas, 500 — Porto Alegre/RS</p></div>
+      <div class="info-card"><span class="info-icon">🚗</span><h4>Estacionamento</h4><p>Estacionamento próprio gratuito no local com capacidade para 500 veículos.</p></div>
+      <div class="info-card"><span class="info-icon">♿</span><h4>Acessibilidade</h4><p>O espaço é 100% acessível com rampas, banheiros adaptados e área especial.</p></div>
+      <div class="info-card"><span class="info-icon">🎟️</span><h4>Ingressos</h4><p>Pista: R$ 60 (1º lote) · R$ 80 (2º lote)<br>VIP: R$ 120<br><a href="https://wa.me/55984281644" target="_blank">Comprar no WhatsApp →</a></p></div>
+      <div class="info-card"><span class="info-icon">🍕</span><h4>Alimentação</h4><p>Food trucks no local com opções variadas. Open bar de bebidas disponível no VIP.</p></div>
+      <div class="info-card"><span class="info-icon">🔞</span><h4>Classificação</h4><p>Evento para maiores de 18 anos. Documento com foto é obrigatório na entrada.</p></div>
+      <div class="info-card"><span class="info-icon">📲</span><h4>Contato</h4><p><a href="https://wa.me/55984281644" target="_blank">WhatsApp: (98) 4281-644</a><br>flashback@festa.com.br</p></div>
+    </div>
+ 
+    <h2 class="sec-title">Perguntas Frequentes</h2>
+    <div class="sec-line"></div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Como compro o ingresso? <span class="arrow">›</span></button>
+        <div class="faq-a">Os ingressos são vendidos exclusivamente pelo nosso WhatsApp. Clique no botão "Garantir Ingresso" e fale com a gente!</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Qual é o dress code? <span class="arrow">›</span></button>
+        <div class="faq-a">A temática é anos 70, 80 e 90! Capriche no visual retrô. Quem vier fantasiado ganha uma cortesia no bar na entrada.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Posso transferir meu ingresso? <span class="arrow">›</span></button>
+        <div class="faq-a">Sim! Entre em contato pelo WhatsApp para solicitar a transferência. O nome do titular deve ser atualizado até 48h antes do evento.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Tem área VIP? O que está incluso? <span class="arrow">›</span></button>
+        <div class="faq-a">Sim! O VIP inclui área exclusiva com melhor visibilidade, open bar de bebidas selecionadas e serviço de mesa. Vagas limitadas.</div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">Haverá estacionamento? <span class="arrow">›</span></button>
+        <div class="faq-a">Sim! Estacionamento gratuito no Pavilhão Sul com capacidade para 500 veículos, monitorado durante todo o evento.</div>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="footer-inner"><div><div class="ft-logo">FLASHBACK</div><p>14 de Junho de 2025 · Pavilhão Sul</p></div><div></div><div></div></div>
+  </footer>
+</div>
+ 
+<!-- ═══ ADMIN ═══ -->
+<div class="page" id="page-admin">
+  <div class="admin-wrapper" id="loginWrapper">
+    <div class="login-box">
+      <h2>⚡ Admin</h2>
+      <p>Acesso restrito — somente administradores</p>
+      <div class="form-group"><label>Usuário</label>
+        <input type="text" id="fUser" placeholder="admin" autocomplete="off"></div>
+      <div class="form-group"><label>Senha</label>
+        <input type="password" id="fPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="login-btn" onclick="doLogin()">Entrar</button>
+      <div class="login-err" id="loginErr">Usuário ou senha incorretos.</div>
+    </div>
+  </div>
+ 
+  <div class="admin-panel" id="adminPanel">
+    <div class="admin-topbar">
+      <h2>⚡ Painel Admin — FLASHBACK</h2>
+      <button class="logout-btn" onclick="doLogout()">Sair</button>
+    </div>
+    <div class="admin-tabs">
+      <button class="tab-btn active" onclick="switchTab('news')">📰 Notícias</button>
+      <button class="tab-btn" onclick="switchTab('djs')">🎧 DeeJays</button>
+      <button class="tab-btn" onclick="switchTab('stats')">📊 Estatísticas</button>
+      <button class="tab-btn" onclick="switchTab('config')">⚙️ Configurações</button>
+    </div>
+ 
+    <!-- TAB NEWS -->
+    <div class="tab-pane active" id="tab-news">
+      <div class="tbl-header">
+        <h3>Gerenciar Notícias</h3>
+        <button class="btn btn-primary" onclick="openNewsForm()">+ Nova Notícia</button>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Img</th><th>Título</th><th>Categoria</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+        <tbody id="newsTbody"></tbody>
+      </table>
+    </div>
+ 
+    <!-- TAB DJS -->
+    <div class="tab-pane" id="tab-djs">
+      <div class="tbl-header">
+        <h3>Gerenciar DeeJays</h3>
+        <button class="btn btn-primary" onclick="openDjForm()">+ Novo DJ</button>
+      </div>
+      <table class="admin-table">
+        <thead><tr><th>Nome</th><th>Estilo</th><th>Horário</th><th>Décadas</th><th>Ações</th></tr></thead>
+        <tbody id="djTbody"></tbody>
+      </table>
+    </div>
+ 
+    <!-- TAB STATS -->
+    <div class="tab-pane" id="tab-stats">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-label">Notícias</div><div class="stat-number" id="st-news">–</div></div>
+        <div class="stat-card" style="border-top-color:var(--pink)"><div class="stat-label">DeeJays</div><div class="stat-number" style="color:var(--pink)" id="st-djs">–</div></div>
+        <div class="stat-card" style="border-top-color:var(--yellow)"><div class="stat-label">Publicados</div><div class="stat-number" style="color:var(--yellow)" id="st-pub">–</div></div>
+        <div class="stat-card" style="border-top-color:var(--purple)"><div class="stat-label">Rascunhos</div><div class="stat-number" style="color:var(--purple)" id="st-draft">–</div></div>
+      </div>
+      <p style="color:var(--muted);font-size:.84rem;letter-spacing:1px">Dados atualizados em tempo real a partir do servidor Flask.</p>
+    </div>
+
+    <!-- TAB CONFIG -->
+    <div class="tab-pane" id="tab-config">
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">🎪 Hero &amp; Fita</div>
+        <div class="cfg-grid-2">
+          <div class="form-group">
+            <label>Subtítulo acima do título</label>
+            <input type="text" id="cfgHeroSub" placeholder="A maior festa retrô do ano">
+          </div>
+          <div class="form-group">
+            <label>Título principal</label>
+            <input type="text" id="cfgHeroTitle" placeholder="FLASHBACK">
+          </div>
+        </div>
+        <div class="cfg-grid-2">
+          <div class="form-group">
+            <label>Data exibida no hero (texto livre)</label>
+            <input type="text" id="cfgHeroDate" placeholder="14 de Junho de 2025">
+          </div>
+          <div class="form-group">
+            <label>Local exibido no hero</label>
+            <input type="text" id="cfgHeroLocal" placeholder="Pavilhão Sul">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Frases da fita rosa (uma por linha)</label>
+          <textarea id="cfgTickerPhrases" style="min-height:100px;resize:vertical" placeholder="Nova data confirmada: 14 de Junho&#10;Line-up completo anunciado"></textarea>
+          <span class="cfg-hint">Cada linha vira uma frase. A fita duplica automaticamente.</span>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">📅 Data do Evento &amp; Contagem Regressiva</div>
+        <div class="form-group">
+          <label>Data e hora do evento</label>
+          <input type="datetime-local" id="cfgEventDate">
+          <span class="cfg-hint">Essa data alimenta a contagem regressiva no site. Quando chegar no dia, aparecerá "A FESTA COMEÇOU!"</span>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">🃏 Cards de Informação (Home)</div>
+        <div class="cfg-grid-2">
+          <div class="form-group">
+            <label>📅 Data &amp; Horário</label>
+            <textarea id="cfgInfoDate" style="min-height:60px;resize:vertical" placeholder="14 de Junho de 2025&#10;A partir das 18h até às 4h"></textarea>
+          </div>
+          <div class="form-group">
+            <label>📍 Local</label>
+            <textarea id="cfgInfoLocal" style="min-height:60px;resize:vertical" placeholder="Pavilhão Sul — Centro de Eventos&#10;Rua das Festas, 500"></textarea>
+          </div>
+          <div class="form-group">
+            <label>🎟️ Ingressos</label>
+            <textarea id="cfgInfoIngressos" style="min-height:60px;resize:vertical" placeholder="Pista: a partir de R$ 60&#10;VIP: a partir de R$ 120"></textarea>
+          </div>
+          <div class="form-group">
+            <label>👗 Dress Code</label>
+            <textarea id="cfgInfoDressCode" style="min-height:60px;resize:vertical" placeholder="Visual retrô dos anos 70, 80 ou 90."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">📣 Faixa CTA (chamada para ação)</div>
+        <div class="cfg-grid-2">
+          <div class="form-group">
+            <label>Título da faixa</label>
+            <input type="text" id="cfgCtaTitle" placeholder="Garanta sua vaga agora!">
+          </div>
+          <div class="form-group">
+            <label>Subtítulo da faixa</label>
+            <input type="text" id="cfgCtaSubtitle" placeholder="Ingressos limitados...">
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">📱 WhatsApp &amp; Contato</div>
+        <div class="cfg-grid-2">
+          <div class="form-group">
+            <label>Número do WhatsApp (só dígitos)</label>
+            <input type="text" id="cfgWhatsapp" placeholder="55984281644">
+            <span class="cfg-hint">Ex: 55984281644 (código do país + DDD + número)</span>
+          </div>
+          <div class="form-group">
+            <label>E-mail de contato (rodapé)</label>
+            <input type="text" id="cfgFooterEmail" placeholder="flashback@festa.com.br">
+          </div>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">🎧 Página DeeJays</div>
+        <div class="form-group">
+          <label>Subtítulo da página de DJs</label>
+          <textarea id="cfgDjsSubtitle" style="min-height:60px;resize:vertical"></textarea>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">🕐 Página Programação</div>
+        <div class="form-group">
+          <label>Subtítulo da página de Programação</label>
+          <textarea id="cfgProgSubtitle" style="min-height:60px;resize:vertical"></textarea>
+        </div>
+      </div>
+
+      <div class="cfg-section">
+        <div class="cfg-section-title">🦶 Rodapé</div>
+        <div class="form-group">
+          <label>Tagline do rodapé</label>
+          <input type="text" id="cfgFooterTagline" placeholder="A maior festa retrô do Sul do Brasil">
+        </div>
+      </div>
+
+      <div class="form-actions" style="justify-content:flex-start;padding-top:.5rem">
+        <button class="btn btn-primary" onclick="applyConfig()">💾 Aplicar e Salvar tudo</button>
+        <button class="btn btn-ghost" onclick="resetConfig()">↩ Restaurar padrão</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
+<!-- ═══ JAVASCRIPT ═══ -->
+<script>
+const API = '';
+let newsCache = [], djCache = [], uploadedImageUrl = '', uploadedDjImageUrl = '';
+ 
+/* ── utils ── */
+function toast(msg, type='ok'){
+  const el = document.createElement('div');
+  el.className = `toast-msg ${type}`;
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(), 3500);
+}
+/* ── MODO APP: dados em localStorage (sem servidor Flask) ── */
+const DB = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('db_'+k)||'null'); }catch(e){return null;} },
+  set(k,v){ localStorage.setItem('db_'+k, JSON.stringify(v)); },
+};
+
+// Seed inicial se vazio
+(function seedDB(){
+  if(!DB.get('news')){
+    DB.set('news',[
+      {id:'n1',title:'Line-up completo revelado com 8 DJs',category:'Line-up',content:'A festa FLASHBACK confirma sua maior edição com DJs especializados em décadas 70, 80 e 90.',icon:'🎶',image:'',status:'published',date:'28/05/2025'},
+      {id:'n2',title:'Pista VIP com bola de discoteca original',category:'Estrutura',content:'A área VIP contará com bola de discoteca importada dos anos 70, criando aquele efeito nostálgico inesquecível.',icon:'🪩',image:'',status:'published',date:'22/05/2025'},
+      {id:'n3',title:'Lote promocional esgota em 48 horas',category:'Ingressos',content:'O primeiro lote foi encerrado em tempo recorde. O segundo lote está disponível a partir de R$ 60.',icon:'🎟️',image:'',status:'published',date:'18/05/2025'},
+      {id:'n4',title:'Regulamento do dress code retrô',category:'Dress Code',content:'Venha com o visual dos anos 80! Legging, ombreiras e mullet são bem-vindos. Fantasiados ganham cortesia no bar.',icon:'👗',image:'',status:'published',date:'15/05/2025'},
+    ]);
+  }
+  if(!DB.get('djs')){
+    DB.set('djs',[
+      {id:'d1',name:'DJ WolfmanBen',style:'Disco & Funk',description:'O mestre do groove! Coleciona vinis desde 1976 e leva o público ao delírio com hits do Soul, Funk e Disco.',decades:['70s','80s'],color:'linear-gradient(135deg,#ff2d78,#c400ff)',initials:'WB',schedule:'21:00 – 22:30'},
+      {id:'d2',name:'DJ Karen',style:'New Wave & Synth',description:'Rainha do sintetizador! Especialista em New Wave, Synth Pop e Italo Disco.',decades:['80s'],color:'linear-gradient(135deg,#00f0ff,#0040ff)',initials:'KA',schedule:'22:30 – 00:00'},
+      {id:'d3',name:'DJ Marquinho',style:'Eurodance & Techno',description:'Do Eurodance ao Techno, domina os anos 90 com energia total.',decades:['90s'],color:'linear-gradient(135deg,#ffe600,#ff6600)',initials:'MR',schedule:'00:00 – 02:00'},
+      {id:'d4',name:'DJ Lady Rock',style:'Pop Rock & Metal',description:'Comanda o palco alternativo com Guns N Roses, Nirvana e Bon Jovi.',decades:['80s','90s'],color:'linear-gradient(135deg,#ff2d78,#800040)',initials:'LR',schedule:'02:00 – 03:30'},
+    ]);
+  }
+  if(!DB.get('session')){ DB.set('session',{admin:false}); }
+})();
+
+/* helpers de ID */
+function genId(){ return Math.random().toString(36).slice(2)+Date.now().toString(36); }
+
+/* MOCK DA API — mesma interface de antes, sem fetch */
+async function api(path, opts={}){
+  const method = (opts.method||'GET').toUpperCase();
+  let body = null;
+  try{ body = opts.body ? JSON.parse(opts.body) : null; }catch(e){}
+
+  await new Promise(r=>setTimeout(r,30)); // simula latência mínima
+
+  // AUTH
+  if(path==='/api/me')
+    return {ok:true,data:{admin: DB.get('session')?.admin||false}};
+  if(path==='/api/login' && method==='POST'){
+    if(body?.username==='admin' && body?.password==='admin'){
+      DB.set('session',{admin:true});
+      return {ok:true,data:{success:true}};
+    }
+    return {ok:false,status:401,data:{success:false}};
+  }
+  if(path==='/api/logout' && method==='POST'){
+    DB.set('session',{admin:false});
+    return {ok:true,data:{success:true}};
+  }
+
+  // NEWS
+  if(path==='/api/news'){
+    if(method==='GET')  return {ok:true,data:DB.get('news')||[]};
+    if(method==='POST'){
+      const news=DB.get('news')||[];
+      const item={...body,id:genId(),date:new Date().toLocaleDateString('pt-BR')};
+      news.unshift(item); DB.set('news',news);
+      return {ok:true,data:item};
+    }
+  }
+  const newsMatch = path.match(/^\/api\/news\/(.+)$/);
+  if(newsMatch){
+    const id=newsMatch[1]; const news=DB.get('news')||[];
+    if(method==='PUT'){
+      const i=news.findIndex(n=>n.id===id);
+      if(i<0) return {ok:false,data:{error:'Não encontrado'}};
+      news[i]={...news[i],...body,id};
+      DB.set('news',news); return {ok:true,data:news[i]};
+    }
+    if(method==='DELETE'){
+      DB.set('news',news.filter(n=>n.id!==id));
+      return {ok:true,data:{success:true}};
+    }
+  }
+
+  // DJS
+  if(path==='/api/djs'){
+    if(method==='GET')  return {ok:true,data:DB.get('djs')||[]};
+    if(method==='POST'){
+      const djs=DB.get('djs')||[];
+      const raw=body?.decades||[];
+      const decades=typeof raw==='string'?raw.split(',').map(s=>s.trim()).filter(Boolean):raw;
+      const item={...body,decades,id:genId()};
+      djs.push(item); DB.set('djs',djs);
+      return {ok:true,data:item};
+    }
+  }
+  const djMatch = path.match(/^\/api\/djs\/(.+)$/);
+  if(djMatch){
+    const id=djMatch[1]; const djs=DB.get('djs')||[];
+    if(method==='PUT'){
+      const i=djs.findIndex(d=>d.id===id);
+      if(i<0) return {ok:false,data:{error:'Não encontrado'}};
+      const raw=body?.decades||[];
+      const decades=typeof raw==='string'?raw.split(',').map(s=>s.trim()).filter(Boolean):raw;
+      djs[i]={...djs[i],...body,decades,id};
+      DB.set('djs',djs); return {ok:true,data:djs[i]};
+    }
+    if(method==='DELETE'){
+      DB.set('djs',djs.filter(d=>d.id!==id));
+      return {ok:true,data:{success:true}};
+    }
+  }
+
+  // UPLOAD — no app mode, converte imagem para base64 e armazena
+  if(path==='/api/upload' && method==='POST'){
+    return {ok:false,data:{error:'Use a seleção direta de imagem no app'}};
+  }
+
+  return {ok:false,status:404,data:{error:'Rota não encontrada'}};
+}
+function esc(s=''){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+ 
+/* ── navigation ── */
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const btn = document.getElementById('nav-'+page);
+  if(btn) btn.classList.add('active');
+  window.scrollTo(0,0);
+  if(page==='home'){
+    // Re-aplica config toda vez que volta para home (garante heroDate/heroLocal atualizados)
+    applyConfigToPage(loadConfig());
+    loadHomeNews();
+    // enable inline edit if admin is logged in
+    enableHeroEdit();
+  } else {
+    disableHeroEdit();
+  }
+  if(page==='news')  { loadFullNews(); }
+  if(page==='djs')   { loadDjs(); }
+  if(page==='prog')  { loadProg(); }
+  if(page==='admin') { checkSession(); }
+}
+function toggleMob(){ document.getElementById('mobNav').classList.toggle('open'); }
+function closeMob()  { document.getElementById('mobNav').classList.remove('open'); }
+ 
+/* ── countdown ── */
+function updateCountdown(){
+  const cfg     = loadConfig();
+  const dateStr = (cfg && cfg.eventDate) ? cfg.eventDate : '2025-06-14T18:00:00';
+  const target  = new Date(dateStr);
+  const now     = new Date();
+  const diff    = target - now;
+  const label   = document.getElementById('countdownLabel');
+  const grid    = document.getElementById('countdownGrid');
+  if(diff <= 0){
+    if(label){ label.textContent = 'A FESTA COMEÇOU! 🎉'; label.style.color = 'var(--yellow)'; }
+    if(grid)  grid.style.display = 'none';
+    return;
+  }
+  if(label){ label.textContent = 'A FESTA COMEÇARÁ EM'; label.style.color = ''; }
+  if(grid)  grid.style.display = '';
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  const cdD = document.getElementById('cd-d');
+  const cdH = document.getElementById('cd-h');
+  const cdM = document.getElementById('cd-m');
+  const cdS = document.getElementById('cd-s');
+  if(cdD) cdD.textContent = String(d).padStart(2,'0');
+  if(cdH) cdH.textContent = String(h).padStart(2,'0');
+  if(cdM) cdM.textContent = String(m).padStart(2,'0');
+  if(cdS) cdS.textContent = String(s).padStart(2,'0');
+}
+ 
+/* ── news public ── */
+function renderNewsCards(arr, containerId, limit=0){
+  const grid = document.getElementById(containerId);
+  const pub  = arr.filter(n=>n.status==='published');
+  const items = limit ? pub.slice(0,limit) : pub;
+  if(!items.length){ grid.innerHTML='<div class="empty-state"><span class="big">📭</span>Nenhuma notícia publicada.</div>'; return; }
+  grid.innerHTML = items.map(n=>`
+    <div class="news-card ${n.image?'has-img':'no-img'}">
+      ${n.image ? `<img class="news-img" src="${esc(n.image)}" alt="${esc(n.title)}">` : `<div class="news-icon-box">${n.icon||'🎶'}</div>`}
+      <div class="news-body">
+        <p class="news-tag">${esc(n.category)}</p>
+        <h3>${esc(n.title)}</h3>
+        <p>${esc(n.content)}</p>
+        <p class="news-date">${esc(n.date)}</p>
+      </div>
+    </div>`).join('');
+}
+async function loadHomeNews(){
+  const {ok,data} = await api('/api/news');
+  if(!ok) return;
+  newsCache = data;
+  renderNewsCards(data,'homeNewsGrid',6);
+  // ticker
+  const pub = data.filter(n=>n.status==='published');
+  if(pub.length){
+    const msgs = [...pub,...pub].map(n=>`<span>${esc(n.title)}</span>`).join('');
+    document.getElementById('ticker').innerHTML = msgs;
+  }
+}
+async function loadFullNews(){
+  const {ok,data} = await api('/api/news');
+  if(!ok) return;
+  newsCache = data;
+  renderNewsCards(data,'fullNewsGrid');
+}
+ 
+/* ── djs public ── */
+async function loadDjs(){
+  const {ok,data} = await api('/api/djs');
+  const grid = document.getElementById('djGrid');
+  if(!ok||!data.length){ grid.innerHTML='<div class="empty-state"><span class="big">🎧</span>Nenhum DJ cadastrado.</div>'; return; }
+  djCache = data;
+  grid.innerHTML = data.map(dj=>`
+    <div class="dj-card">
+      <div class="dj-avatar" style="background:${dj.photo?'none':dj.color||'linear-gradient(135deg,#ff2d78,#c400ff)'}">
+        ${dj.photo?`<img src="${esc(dj.photo)}" alt="${esc(dj.name)}">`:`${esc(dj.initials||'DJ')}`}
+      </div>
+      <div class="dj-name">${esc(dj.name)}</div>
+      <div class="dj-style">${esc(dj.style)}</div>
+      ${dj.schedule?`<div class="dj-schedule">🕐 ${esc(dj.schedule)}</div>`:''}
+      <p class="dj-desc">${esc(dj.description)}</p>
+      <div class="dj-decades">${(dj.decades||[]).map(d=>`<span class="dj-decade">${esc(d)}</span>`).join('')}</div>
+    </div>`).join('');
+}
+ 
+/* ── programação ── */
+async function loadProg(){
+  const {ok,data} = await api('/api/djs');
+  const list = document.getElementById('progList');
+  if(!ok||!data.length){ list.innerHTML='<div class="empty-state"><span class="big">🕐</span>Programação em breve.</div>'; return; }
+  const sorted = [...data].filter(d=>d.schedule).sort((a,b)=>a.schedule.localeCompare(b.schedule));
+  if(!sorted.length){ list.innerHTML='<div class="empty-state"><span class="big">🕐</span>Horários não definidos ainda.</div>'; return; }
+  // Checa se admin está logado para mostrar controles de edição
+  const isAdmin = await api('/api/me').then(r=>r.data?.admin).catch(()=>false);
+  list.innerHTML = sorted.map(dj=>`
+    <div class="prog-item">
+      <div class="prog-time">${esc(dj.schedule)}</div>
+      <div style="flex:1">
+        <div class="prog-dj">${esc(dj.name)}</div>
+        <div class="prog-style">${esc(dj.style)} · ${(dj.decades||[]).join(' · ')}</div>
+      </div>
+      ${isAdmin?`<button class="prog-edit-btn" onclick="editProgSchedule('${dj.id}','${esc(dj.schedule)}','${esc(dj.name)}')">✏️ Horário</button>`:''}
+    </div>`).join('');
+}
+ 
+/* ── FAQ ── */
+function toggleFaq(btn){ btn.closest('.faq-item').classList.toggle('open'); }
+
+/* ── editar horário na programação ── */
+function editProgSchedule(djId, currentSchedule, djName){
+  document.getElementById('modalTitle').textContent = '🕐 Editar Horário';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="color:var(--muted);font-size:.85rem;margin-bottom:1.2rem">DJ: <strong style="color:var(--cyan)">${esc(djName)}</strong></p>
+    <div class="form-group">
+      <label>Horário no palco</label>
+      <input type="text" id="progScheduleInput" value="${esc(currentSchedule)}" placeholder="22:30 – 00:00" style="font-size:1.1rem;text-align:center;letter-spacing:2px">
+      <span style="font-size:.72rem;color:var(--muted);display:block;margin-top:.4rem">Use o formato: 22:30 – 00:00</span>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveProgSchedule('${esc(djId)}')">💾 Salvar Horário</button>
+    </div>`;
+  openModal();
+  document.getElementById('progScheduleInput').focus();
+}
+
+async function saveProgSchedule(djId){
+  const schedule = document.getElementById('progScheduleInput').value.trim();
+  const dj = djCache.find(d=>d.id===djId);
+  if(!dj){ toast('DJ não encontrado','err'); return; }
+  const payload = {...dj, schedule};
+  const {ok} = await api(`/api/djs/${djId}`,{method:'PUT',body:JSON.stringify(payload)});
+  if(ok){
+    toast('Horário atualizado!');
+    closeModal();
+    loadProg();
+    loadAdminDjs();
+  } else {
+    toast('Erro ao salvar horário','err');
+  }
+}
+ 
+/* ── auth ── */
+async function checkSession(){
+  const {ok,data} = await api('/api/me');
+  if(ok && data.admin) showPanel();
+  else showLogin();
+}
+async function doLogin(){
+  const u = document.getElementById('fUser').value.trim();
+  const p = document.getElementById('fPass').value;
+  const {ok,data} = await api('/api/login',{method:'POST',body:JSON.stringify({username:u,password:p})});
+  if(ok && data.success){ document.getElementById('loginErr').classList.remove('show'); showPanel(); }
+  else { document.getElementById('loginErr').classList.add('show'); document.getElementById('fPass').value=''; }
+}
+async function doLogout(){
+  await api('/api/logout',{method:'POST'});
+  showLogin();
+  document.getElementById('fUser').value='';
+  document.getElementById('fPass').value='';
+}
+function showLogin(){ document.getElementById('loginWrapper').style.display='flex'; document.getElementById('adminPanel').classList.remove('show'); disableHeroEdit(); navigate('admin'); }
+function showPanel(){ document.getElementById('loginWrapper').style.display='none'; document.getElementById('adminPanel').classList.add('show'); loadAdminNews(); loadAdminDjs(); }
+ 
+/* ── tabs ── */
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  const map={news:0,djs:1,stats:2,config:3};
+  document.querySelectorAll('.tab-btn')[map[name]].classList.add('active');
+  if(name==='stats') updateStats();
+  if(name==='config') loadConfigFields();
+}
+ 
+/* ── admin news ── */
+async function loadAdminNews(){
+  const {ok,data} = await api('/api/news');
+  if(!ok) return;
+  newsCache = data;
+  renderNewsTbl();
+  updateStats();
+}
+function renderNewsTbl(){
+  const tbody = document.getElementById('newsTbody');
+  if(!newsCache.length){ tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:2rem">Nenhuma notícia.</td></tr>`; return; }
+  tbody.innerHTML = newsCache.map(n=>`
+    <tr>
+      <td>${n.image?`<img class="thumb-admin" src="${esc(n.image)}" alt="">`:`<span style="font-size:1.3rem">${n.icon||'🎶'}</span>`}</td>
+      <td>${esc(n.title)}</td>
+      <td>${esc(n.category)}</td>
+      <td>${esc(n.date)}</td>
+      <td><span class="badge ${n.status==='published'?'pub':'draft'}">${n.status==='published'?'Publicado':'Rascunho'}</span></td>
+      <td>
+        <button class="icon-btn edit" title="Editar" onclick="openNewsForm('${n.id}')">✏️</button>
+        <button class="icon-btn del"  title="Excluir" onclick="deleteNews('${n.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+ 
+function openNewsForm(id){
+  const item = id ? newsCache.find(n=>n.id===id) : null;
+  uploadedImageUrl = item?.image || '';
+  document.getElementById('modalTitle').textContent = item ? 'Editar Notícia' : 'Nova Notícia';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>Título</label>
+      <input type="text" id="nTitle" value="${item?esc(item.title):''}" placeholder="Título da notícia"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Categoria</label>
+        <input type="text" id="nCategory" value="${item?esc(item.category):''}" placeholder="Ex: Line-up"></div>
+      <div class="form-group"><label>Ícone emoji (sem foto)</label>
+        <input type="text" id="nIcon" value="${item?item.icon:'🎶'}" placeholder="🎶"></div>
+    </div>
+    <div class="form-group"><label>Foto da notícia (opcional)</label>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+        <span class="up-icon">📷</span>
+        <p>Clique ou arraste uma imagem aqui<br><small style="opacity:.6">PNG, JPG, GIF, WEBP · Máx 5MB</small></p>
+      </div>
+      <div class="upload-progress" id="uploadProgress"><div class="upload-progress-bar" id="uploadBar"></div></div>
+      <div class="img-preview" id="imgPreview">
+        <img id="previewImg" src="${item&&item.image?esc(item.image):''}" alt="preview">
+        <button class="rm-img" onclick="removeImage()">✕</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Conteúdo</label>
+      <textarea id="nContent" placeholder="Texto da notícia...">${item?esc(item.content):''}</textarea></div>
+    <div class="form-group"><label>Status</label>
+      <select id="nStatus">
+        <option value="published" ${!item||item.status==='published'?'selected':''}>Publicado</option>
+        <option value="draft" ${item&&item.status==='draft'?'selected':''}>Rascunho</option>
+      </select></div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" id="saveNewsBtn" onclick="saveNews('${id||''}')">Salvar</button>
+    </div>`;
+  // show existing image preview
+  if(item && item.image){
+    document.getElementById('imgPreview').style.display='block';
+  }
+  // drag events
+  const zone = document.getElementById('uploadZone');
+  zone.addEventListener('dragover', e=>{e.preventDefault();zone.classList.add('drag');});
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('drag'));
+  zone.addEventListener('drop', e=>{e.preventDefault();zone.classList.remove('drag');if(e.dataTransfer.files[0]) uploadFile(e.dataTransfer.files[0]);});
+  openModal();
+}
+ 
+async function handleFileSelect(e){
+  if(e.target.files[0]) await uploadFile(e.target.files[0]);
+}
+ 
+async function uploadFile(file){
+  const allowed = ['image/png','image/jpeg','image/gif','image/webp'];
+  if(!allowed.includes(file.type)){ toast('Formato não permitido','err'); return; }
+  if(file.size > 5*1024*1024){ toast('Arquivo muito grande (máx 5MB)','err'); return; }
+  const prog = document.getElementById('uploadProgress');
+  const bar  = document.getElementById('uploadBar');
+  prog.style.display='block'; bar.style.width='30%';
+  try{
+    const b64 = await new Promise((res,rej)=>{
+      const r=new FileReader();
+      r.onload=()=>res(r.result);
+      r.onerror=rej;
+      r.readAsDataURL(file);
+    });
+    bar.style.width='100%';
+    uploadedImageUrl = b64;
+    document.getElementById('previewImg').src = b64;
+    document.getElementById('imgPreview').style.display = 'block';
+    toast('Foto carregada com sucesso!');
+  } catch(e){ toast('Erro ao carregar imagem','err'); }
+  setTimeout(()=>{ prog.style.display='none'; bar.style.width='0%'; },600);
+}
+ 
+function removeImage(){
+  uploadedImageUrl='';
+  document.getElementById('imgPreview').style.display='none';
+  document.getElementById('previewImg').src='';
+  document.getElementById('fileInput').value='';
+}
+ 
+async function saveNews(id){
+  const payload = {
+    title:    document.getElementById('nTitle').value.trim(),
+    category: document.getElementById('nCategory').value.trim(),
+    icon:     document.getElementById('nIcon').value.trim()||'🎶',
+    content:  document.getElementById('nContent').value.trim(),
+    status:   document.getElementById('nStatus').value,
+    image:    uploadedImageUrl
+  };
+  if(!payload.title){ toast('O título é obrigatório.','err'); return; }
+  const {ok} = id
+    ? await api(`/api/news/${id}`,{method:'PUT', body:JSON.stringify(payload)})
+    : await api('/api/news',      {method:'POST',body:JSON.stringify(payload)});
+  if(ok){ toast(id?'Notícia atualizada!':'Notícia criada!'); closeModal(); loadAdminNews(); if(document.getElementById('page-home').classList.contains('active')) loadHomeNews(); }
+  else     toast('Erro ao salvar.','err');
+}
+ 
+async function deleteNews(id){
+  if(!confirm('Excluir esta notícia?')) return;
+  const {ok} = await api(`/api/news/${id}`,{method:'DELETE'});
+  if(ok){ toast('Notícia excluída.'); loadAdminNews(); }
+  else    toast('Erro ao excluir.','err');
+}
+ 
+/* ── admin djs ── */
+const DJ_COLORS=[
+  {label:'Rosa → Roxo',      value:'linear-gradient(135deg,#ff2d78,#c400ff)'},
+  {label:'Ciano → Azul',     value:'linear-gradient(135deg,#00f0ff,#0040ff)'},
+  {label:'Amarelo → Laranja',value:'linear-gradient(135deg,#ffe600,#ff6600)'},
+  {label:'Roxo → Vinho',     value:'linear-gradient(135deg,#c400ff,#4400aa)'},
+  {label:'Verde → Escuro',   value:'linear-gradient(135deg,#00ff88,#008844)'},
+  {label:'Rosa → Escuro',    value:'linear-gradient(135deg,#ff2d78,#800040)'},
+];
+ 
+async function loadAdminDjs(){
+  const {ok,data} = await api('/api/djs');
+  if(!ok) return;
+  djCache = data;
+  renderDjTbl();
+  updateStats();
+}
+function renderDjTbl(){
+  const tbody = document.getElementById('djTbody');
+  if(!djCache.length){ tbody.innerHTML=`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:2rem">Nenhum DJ cadastrado.</td></tr>`; return; }
+  tbody.innerHTML = djCache.map(dj=>`
+    <tr>
+      <td><strong>${esc(dj.name)}</strong></td>
+      <td>${esc(dj.style)}</td>
+      <td>${esc(dj.schedule||'–')}</td>
+      <td>${(dj.decades||[]).map(d=>`<span class="badge pub">${esc(d)}</span>`).join(' ')}</td>
+      <td>
+        <button class="icon-btn edit" onclick="openDjForm('${dj.id}')">✏️</button>
+        <button class="icon-btn del"  onclick="deleteDj('${dj.id}')">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+ 
+function openDjForm(id){
+  const item = id ? djCache.find(d=>d.id===id) : null;
+  uploadedDjImageUrl = item?.photo || '';
+  const colorOpts = DJ_COLORS.map(c=>`<option value="${c.value}" ${item&&item.color===c.value?'selected':''}>${c.label}</option>`).join('');
+  document.getElementById('modalTitle').textContent = item ? 'Editar DJ' : 'Novo DJ';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>Foto do DJ (opcional)</label>
+      <div class="upload-zone" id="djUploadZone">
+        <input type="file" id="djFileInput" accept="image/*" onchange="handleDjFileSelect(event)">
+        <span class="up-icon">📷</span>
+        <p>Clique ou arraste a foto do DJ<br><small style="opacity:.6">PNG, JPG, WEBP · Máx 5MB</small></p>
+      </div>
+      <div class="upload-progress" id="djUploadProgress"><div class="upload-progress-bar" id="djUploadBar"></div></div>
+      <div class="img-preview" id="djImgPreview" style="${item&&item.photo?'display:block':'display:none'}">
+        <img id="djPreviewImg" src="${item&&item.photo?esc(item.photo):''}" alt="preview" style="border-radius:50%;height:100px;width:100px;object-fit:cover;">
+        <button class="rm-img" onclick="removeDjImage()" style="top:.3rem;right:.3rem">✕</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Nome Artístico</label>
+        <input type="text" id="djName" value="${item?esc(item.name):''}" placeholder="DJ Karen"></div>
+      <div class="form-group"><label>Iniciais (se sem foto)</label>
+        <input type="text" id="djInitials" value="${item?esc(item.initials||'DJ'):''}" placeholder="KA" maxlength="3"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Estilo Musical</label>
+        <input type="text" id="djStyle" value="${item?esc(item.style):''}" placeholder="New Wave & Synth"></div>
+      <div class="form-group"><label>Horário no palco</label>
+        <input type="text" id="djSchedule" value="${item?esc(item.schedule||''):''}" placeholder="22:30 – 00:00"></div>
+    </div>
+    <div class="form-group"><label>Descrição / Bio</label>
+      <textarea id="djDesc" placeholder="Bio do DJ...">${item?esc(item.description):''}</textarea></div>
+    <div class="form-row">
+      <div class="form-group"><label>Décadas (separadas por vírgula)</label>
+        <input type="text" id="djDecades" value="${item?(item.decades||[]).join(', '):''}" placeholder="70s, 80s, 90s"></div>
+      <div class="form-group"><label>Cor do avatar (se sem foto)</label>
+        <select id="djColor">${colorOpts}</select></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveDj('${id||''}')">Salvar</button>
+    </div>`;
+  openModal();
+  // drag events para zona de upload do DJ
+  const dz = document.getElementById('djUploadZone');
+  if(dz){
+    dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag');});
+    dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
+    dz.addEventListener('drop', e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0]) uploadDjFile(e.dataTransfer.files[0]);});
+  }
+}
+ 
+async function handleDjFileSelect(e){ if(e.target.files[0]) await uploadDjFile(e.target.files[0]); }
+
+async function uploadDjFile(file){
+  const allowed = ['image/png','image/jpeg','image/gif','image/webp'];
+  if(!allowed.includes(file.type)){ toast('Formato não permitido','err'); return; }
+  if(file.size > 5*1024*1024){ toast('Arquivo muito grande (máx 5MB)','err'); return; }
+  const prog = document.getElementById('djUploadProgress');
+  const bar  = document.getElementById('djUploadBar');
+  prog.style.display='block'; bar.style.width='0%';
+  const form = new FormData();
+  form.append('file', file);
+  let pct=0; const iv=setInterval(()=>{pct=Math.min(pct+8,85);bar.style.width=pct+'%';},80);
+  try{
+    const r = await fetch('/api/upload',{method:'POST',credentials:'include',body:form});
+    clearInterval(iv); bar.style.width='100%';
+    const data = await r.json();
+    if(r.ok){
+      uploadedDjImageUrl = data.url;
+      document.getElementById('djPreviewImg').src = data.url;
+      document.getElementById('djImgPreview').style.display = 'block';
+      toast('Foto enviada!');
+    } else { toast(data.error||'Erro no upload','err'); }
+  } catch(e){ clearInterval(iv); toast('Erro no upload','err'); }
+  setTimeout(()=>{ prog.style.display='none'; bar.style.width='0%'; },600);
+}
+
+function removeDjImage(){
+  uploadedDjImageUrl='';
+  document.getElementById('djImgPreview').style.display='none';
+  document.getElementById('djPreviewImg').src='';
+  document.getElementById('djFileInput').value='';
+}
+ 
+async function saveDj(id){
+  const payload={
+    name:        document.getElementById('djName').value.trim(),
+    initials:    document.getElementById('djInitials').value.trim().toUpperCase()||'DJ',
+    style:       document.getElementById('djStyle').value.trim(),
+    schedule:    document.getElementById('djSchedule').value.trim(),
+    description: document.getElementById('djDesc').value.trim(),
+    decades:     document.getElementById('djDecades').value,
+    color:       document.getElementById('djColor').value,
+    photo:       uploadedDjImageUrl
+  };
+  if(!payload.name){ toast('O nome é obrigatório.','err'); return; }
+  const {ok} = id
+    ? await api(`/api/djs/${id}`,{method:'PUT', body:JSON.stringify(payload)})
+    : await api('/api/djs',      {method:'POST',body:JSON.stringify(payload)});
+  if(ok){ toast(id?'DJ atualizado!':'DJ cadastrado!'); closeModal(); loadAdminDjs(); if(document.getElementById('page-djs').classList.contains('active')) loadDjs(); if(document.getElementById('page-prog').classList.contains('active')) loadProg(); }
+  else    toast('Erro ao salvar DJ.','err');
+}
+ 
+async function deleteDj(id){
+  if(!confirm('Excluir este DJ?')) return;
+  const {ok} = await api(`/api/djs/${id}`,{method:'DELETE'});
+  if(ok){ toast('DJ removido.'); loadAdminDjs(); }
+  else    toast('Erro ao excluir.','err');
+}
+ 
+/* ── stats ── */
+function updateStats(){
+  document.getElementById('st-news').textContent  = newsCache.length;
+  document.getElementById('st-djs').textContent   = djCache.length;
+  document.getElementById('st-pub').textContent   = newsCache.filter(n=>n.status==='published').length;
+  document.getElementById('st-draft').textContent = newsCache.filter(n=>n.status==='draft').length;
+}
+ 
+/* ── modal ── */
+function openModal()  { document.getElementById('modalBg').classList.add('open'); }
+function closeModal() { document.getElementById('modalBg').classList.remove('open'); uploadedImageUrl=''; uploadedDjImageUrl=''; }
+document.getElementById('modalBg').addEventListener('click',e=>{ if(e.target===document.getElementById('modalBg')) closeModal(); });
+ 
+/* ── configurações da home (localStorage) ── */
+const CFG_KEY = 'flashback_config';
+const DEFAULTS = {
+  heroSub:        'A maior festa retrô do ano',
+  heroTitle:      'FLASHBACK',
+  ticker:         ['Nova data confirmada: 14 de Junho','Line-up completo anunciado','Ingressos VIP disponíveis via WhatsApp','Dress code: figurino dos anos 80','Sorteio de brindes na entrada'],
+  eventDate:      '2025-06-14T18:00:00',
+  // Home - info cards
+  infoDate:       '14 de Junho de 2025\nA partir das 18h até às 4h',
+  infoLocal:      'Pavilhão Sul — Centro de Eventos\nRua das Festas, 500 — Porto Alegre/RS',
+  infoIngressos:  'Pista: a partir de R$ 60\nVIP: a partir de R$ 120',
+  infoDressCode:  'Visual retrô dos anos 70, 80 ou 90.\nFantasiados ganham cortesia no bar!',
+  // CTA Band
+  ctaTitle:       'Garanta sua vaga agora!',
+  ctaSubtitle:    'Ingressos limitados — não perca a maior festa retrô do ano',
+  // WhatsApp
+  whatsapp:       '55984281644',
+  // DJs page subtitle
+  djsSubtitle:    'Conheça os artistas que vão fazer a festa! Cada DJ é especialista em uma ou mais décadas e vai garantir que você dance do início ao fim.',
+  // Programação subtitle
+  progSubtitle:   'Ordem dos sets e horários no palco. Prepare-se para uma noite incrível do início ao fim!',
+  // Footer
+  footerTagline:  'A maior festa retrô do Sul do Brasil',
+  footerEmail:    'flashback@festa.com.br',
+  // Hero date line
+  heroDate:       '14 de Junho de 2025',
+  heroLocal:      'Pavilhão Sul',
+};
+
+function loadConfig(){
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {...DEFAULTS}; }
+  catch(e){ return {...DEFAULTS}; }
+}
+function saveConfig(cfg){ localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
+
+function applyConfigToPage(cfg){
+  const g = (k) => cfg[k] !== undefined ? cfg[k] : DEFAULTS[k];
+  // hero
+  document.getElementById('heroSub').textContent   = g('heroSub');
+  document.getElementById('heroTitle').textContent = g('heroTitle');
+  renderTicker(g('ticker'));
+  const heroDateEl  = document.getElementById('heroDateText');
+  const heroLocalEl = document.getElementById('heroLocalText');
+  if(heroDateEl)  heroDateEl.textContent  = g('heroDate');
+  if(heroLocalEl) heroLocalEl.textContent = g('heroLocal');
+  // info cards (home)
+  const ic = document.querySelectorAll('.info-card-dynamic');
+  if(ic.length >= 4){
+    ic[0].innerHTML = g('infoDate').replace(/\n/g,'<br>');
+    ic[1].innerHTML = g('infoLocal').replace(/\n/g,'<br>');
+    ic[2].innerHTML = g('infoIngressos').replace(/\n/g,'<br>') + '<br><a href="https://wa.me/' + g('whatsapp') + '" target="_blank">Comprar via WhatsApp →</a>';
+    ic[3].innerHTML = g('infoDressCode').replace(/\n/g,'<br>');
+  }
+  // CTA band
+  const ctaT = document.getElementById('ctaTitle');
+  const ctaS = document.getElementById('ctaSubtitle');
+  if(ctaT) ctaT.textContent = g('ctaTitle');
+  if(ctaS) ctaS.textContent = g('ctaSubtitle');
+  // WhatsApp links
+  document.querySelectorAll('.wpp-link').forEach(a => {
+    a.href = 'https://wa.me/' + g('whatsapp');
+  });
+  // DJs subtitle
+  const djSub = document.getElementById('djsSubtitle');
+  if(djSub) djSub.textContent = g('djsSubtitle');
+  // Programação subtitle
+  const progSub = document.getElementById('progSubtitle');
+  if(progSub) progSub.textContent = g('progSubtitle');
+  // Footer
+  const ftTag = document.getElementById('footerTagline');
+  const ftEmail = document.getElementById('footerEmail');
+  if(ftTag) ftTag.textContent = g('footerTagline');
+  if(ftEmail) ftEmail.textContent = g('footerEmail');
+}
+
+function renderTicker(phrases){
+  const doubled = [...phrases, ...phrases];
+  document.getElementById('ticker').innerHTML = doubled.map(p=>`<span>${esc(p)}</span>`).join('');
+}
+
+function loadConfigFields(){
+  const cfg = loadConfig();
+  const g = (k) => cfg[k] !== undefined ? cfg[k] : DEFAULTS[k];
+  document.getElementById('cfgHeroSub').value       = g('heroSub');
+  document.getElementById('cfgHeroTitle').value     = g('heroTitle');
+  document.getElementById('cfgTickerPhrases').value = g('ticker').join('\n');
+  document.getElementById('cfgEventDate').value     = g('eventDate').slice(0,16);
+  document.getElementById('cfgInfoDate').value      = g('infoDate');
+  document.getElementById('cfgInfoLocal').value     = g('infoLocal');
+  document.getElementById('cfgInfoIngressos').value = g('infoIngressos');
+  document.getElementById('cfgInfoDressCode').value = g('infoDressCode');
+  document.getElementById('cfgCtaTitle').value      = g('ctaTitle');
+  document.getElementById('cfgCtaSubtitle').value   = g('ctaSubtitle');
+  document.getElementById('cfgWhatsapp').value      = g('whatsapp');
+  document.getElementById('cfgDjsSubtitle').value   = g('djsSubtitle');
+  document.getElementById('cfgProgSubtitle').value  = g('progSubtitle');
+  document.getElementById('cfgFooterTagline').value = g('footerTagline');
+  document.getElementById('cfgFooterEmail').value   = g('footerEmail');
+  document.getElementById('cfgHeroDate').value      = g('heroDate');
+  document.getElementById('cfgHeroLocal').value     = g('heroLocal');
+}
+
+function applyConfig(){
+  const v = id => document.getElementById(id).value.trim();
+  const ticker = v('cfgTickerPhrases').split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!ticker.length){ toast('Adicione ao menos uma frase na fita.','err'); return; }
+  const eventDate = v('cfgEventDate') || (loadConfig().eventDate) || DEFAULTS.eventDate;
+  const cfg = {
+    heroSub:       v('cfgHeroSub')       || DEFAULTS.heroSub,
+    heroTitle:     v('cfgHeroTitle')     || DEFAULTS.heroTitle,
+    ticker,
+    eventDate:     eventDate,
+    infoDate:      document.getElementById('cfgInfoDate').value,
+    infoLocal:     document.getElementById('cfgInfoLocal').value,
+    infoIngressos: document.getElementById('cfgInfoIngressos').value,
+    infoDressCode: document.getElementById('cfgInfoDressCode').value,
+    ctaTitle:      v('cfgCtaTitle')      || DEFAULTS.ctaTitle,
+    ctaSubtitle:   v('cfgCtaSubtitle')   || DEFAULTS.ctaSubtitle,
+    whatsapp:      v('cfgWhatsapp')      || DEFAULTS.whatsapp,
+    djsSubtitle:   document.getElementById('cfgDjsSubtitle').value,
+    progSubtitle:  document.getElementById('cfgProgSubtitle').value,
+    footerTagline: v('cfgFooterTagline') || DEFAULTS.footerTagline,
+    footerEmail:   v('cfgFooterEmail')   || DEFAULTS.footerEmail,
+    heroDate:      v('cfgHeroDate')      || DEFAULTS.heroDate,
+    heroLocal:     v('cfgHeroLocal')     || DEFAULTS.heroLocal,
+  };
+  saveConfig(cfg);
+  applyConfigToPage(cfg);
+  toast('Configurações salvas e aplicadas!');
+}
+
+function resetConfig(){
+  if(!confirm('Restaurar todos os textos para o padrão?')) return;
+  saveConfig({...DEFAULTS});
+  applyConfigToPage(DEFAULTS);
+  loadConfigFields();
+  toast('Textos restaurados.');
+}
+
+/* ── edição inline do hero (modo admin) ── */
+function enableHeroEdit(){
+  document.getElementById('heroSub').contentEditable   = 'true';
+  document.getElementById('heroTitle').contentEditable = 'true';
+  document.getElementById('heroEditBar').classList.add('show');
+  document.getElementById('tickerEditBtn').style.display = 'inline-block';
+}
+
+function disableHeroEdit(){
+  document.getElementById('heroSub').contentEditable   = 'false';
+  document.getElementById('heroTitle').contentEditable = 'false';
+  document.getElementById('heroEditBar').classList.remove('show');
+  document.getElementById('tickerEditBtn').style.display = 'none';
+}
+
+function saveHeroTexts(){
+  const cfg = loadConfig();
+  cfg.heroSub   = document.getElementById('heroSub').textContent.trim()   || DEFAULTS.heroSub;
+  cfg.heroTitle = document.getElementById('heroTitle').textContent.trim() || DEFAULTS.heroTitle;
+  saveConfig(cfg);
+  toast('Textos salvos!');
+  disableHeroEdit();
+  // sync fields in admin if open
+  const cfSub = document.getElementById('cfgHeroSub');
+  if(cfSub) cfSub.value = cfg.heroSub;
+  const cfTitle = document.getElementById('cfgHeroTitle');
+  if(cfTitle) cfTitle.value = cfg.heroTitle;
+}
+
+function cancelHeroEdit(){
+  const cfg = loadConfig();
+  document.getElementById('heroSub').textContent   = cfg.heroSub   || DEFAULTS.heroSub;
+  document.getElementById('heroTitle').textContent = cfg.heroTitle || DEFAULTS.heroTitle;
+  disableHeroEdit();
+}
+
+/* ── modal da fita (ticker) ── */
+function openTickerModal(){
+  const cfg = loadConfig();
+  document.getElementById('modalTitle').textContent = '🎀 Editar Fita Rosa';
+  document.getElementById('modalBody').innerHTML = `
+    <p style="font-size:.8rem;color:var(--muted);margin-bottom:1rem;letter-spacing:.5px">Uma frase por linha. A fita percorre em loop automaticamente.</p>
+    <div class="form-group">
+      <label>Frases da fita</label>
+      <textarea id="tickerTA" style="min-height:160px;resize:vertical">${(cfg.ticker||DEFAULTS.ticker).join('\n')}</textarea>
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTickerModal()">💾 Salvar</button>
+    </div>`;
+  openModal();
+}
+
+function saveTickerModal(){
+  const raw    = document.getElementById('tickerTA').value;
+  const ticker = raw.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!ticker.length){ toast('Adicione ao menos uma frase.','err'); return; }
+  const cfg = loadConfig();
+  cfg.ticker = ticker;
+  saveConfig(cfg);
+  renderTicker(ticker);
+  toast('Fita atualizada!');
+  closeModal();
+  // sync admin field
+  const ta = document.getElementById('cfgTickerPhrases');
+  if(ta) ta.value = ticker.join('\n');
+}
+
+/* ── init ── */
+(function(){
+  const cfg = loadConfig();
+  applyConfigToPage(cfg);
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+  loadHomeNews();
+})();
+</script>
+
+<script>
+// Service worker only for http/https (not Electron file://)
+if('serviceWorker' in navigator && location.protocol !== 'file:'){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(r => console.log('SW registrado:', r.scope))
+      .catch(e => console.log('SW erro:', e));
+  });
+}
+</script>
+</body>
+</html>
